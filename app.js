@@ -97,6 +97,7 @@ function handlePopState(event) {
 
 function updateHeader() {
     const navContainer = document.getElementById('header-nav-actions');
+
     if (appState.module === 'HOME') {
         navContainer.style.display = 'none';
         navContainer.innerHTML = '';
@@ -112,16 +113,23 @@ function updateHeader() {
         const homeAction = "updateState({module: 'HOME', docsPath: [], protectionArea: null, protectionEquip: null, electricalUnit: null})";
 
         let moduleBtnHTML = "";
+
         if (appState.module === 'ELECTRICAL') {
-            moduleBtnHTML = `<button class="nav-pill-btn" onclick="updateState({module: 'ELECTRICAL', electricalUnit: null})">${iconElec} <span class="nav-text">Supply</span></button>`;
+            const moduleAction = "updateState({module: 'ELECTRICAL', electricalUnit: null})";
+            moduleBtnHTML = `<button class="nav-pill-btn" onclick="${moduleAction}">${iconElec} <span class="nav-text">Electrical Supply</span></button>`;
         } else if (appState.module === 'PROTECTION') {
-            moduleBtnHTML = `<button class="nav-pill-btn" onclick="updateState({module: 'PROTECTION', protectionArea: null, protectionEquip: null})">${iconProt} <span class="nav-text">Protection</span></button>`;
+            const moduleAction = "updateState({module: 'PROTECTION', protectionArea: null, protectionEquip: null})";
+            moduleBtnHTML = `<button class="nav-pill-btn" onclick="${moduleAction}">${iconProt} <span class="nav-text">Equipment Protection</span></button>`;
         } else if (appState.module === 'DOCS') {
-            moduleBtnHTML = `<button class="nav-pill-btn" onclick="updateState({module: 'DOCS', docsPath: []})">${iconDocs} <span class="nav-text">Documents</span></button>`;
+            const moduleAction = "updateState({module: 'DOCS', docsPath: []})";
+            moduleBtnHTML = `<button class="nav-pill-btn" onclick="${moduleAction}">${iconDocs} <span class="nav-text">Operation Documents</span></button>`;
         }
 
         const backBtnHTML = `<button class="nav-pill-btn" onclick="${backAction}">${iconBack} <span class="nav-text">Back</span></button>`;
+        const homeBtnHTML = `<button class="nav-pill-btn" onclick="${homeAction}">${iconHome} <span class="nav-text">Home</span></button>`;
+
         navContainer.innerHTML = `${backBtnHTML}${moduleBtnHTML}`;
+        // navContainer.innerHTML = `${backBtnHTML}${moduleBtnHTML}${homeBtnHTML}`;
     }
 }
 
@@ -155,7 +163,7 @@ function renderHome() {
                         <span class="card-subtitle" style="margin-top:0.1rem;">Equipment Supply Check</span>
                     </div>
                 </div>
-                <div class="card-desc" style="margin-top:0;">Look up KKS tags and equipment names for switchgear and module location</div>
+                <div class="card-desc" style="margin-top:0;">Look up KKS tags and equipments for it's supply switchgear and module location</div>
             </button>
             <button class="ui-card" onclick="updateState({module: 'PROTECTION', protectionArea: null, protectionEquip: null})">
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
@@ -185,22 +193,37 @@ function renderHome() {
 // (Keeping your exact previous setup for these to ensure no features are lost)
 function renderElectrical() {
     let units = Object.keys(elecData);
+
     if (!appState.electricalUnit) {
         return `
-            <div class="page-head"><h2 class="page-title font-mono">Plant Areas</h2><p class="page-subtitle">Select a unit or area to search electrical feeds.</p></div>
+            <div class="page-head">
+                <h2 class="page-title font-mono">Electrical Supply</h2>
+                <p class="page-subtitle">Select a plant area to search equipment's electrical supply</p>
+            </div>
             <div class="item-grid" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
                 ${units.map((unit) => `
                     <button class="ui-card" style="padding: 1rem;" onclick="updateState({electricalUnit: '${unit}'})">
-                        <div style="display:flex; align-items:center; gap:0.9rem;"><div class="card-icon-box" style="width: 2.25rem; height: 2.25rem; flex-shrink: 0;">${iconFactory}</div><span class="card-title font-mono">${unit}</span></div>
+                        <div style="display:flex; align-items:center; gap:0.9rem;">
+                            <div class="card-icon-box" style="width: 2.25rem; height: 2.25rem; flex-shrink: 0;">${iconFactory}</div>
+                            <span class="card-title font-mono">${unit}</span>
+                        </div>
                     </button>
                 `).join('')}
             </div>
         `;
     }
+
     return `
-        <div class="page-head"><h2 class="page-title font-mono">${appState.electricalUnit}</h2><p class="page-subtitle">Search KKS or Equipment Name</p></div>
-        <div class="search-wrapper" style="max-width:100%;">${searchBtn}<input type="text" id="elecSearchInput" class="ui-input" placeholder="Type to search (e.g. ACW Pump)..." autocomplete="off"></div>
-        <div class="elec-results-scroll-container" id="elecResults" style="display:none;"></div>
+        <div class="page-head">
+            <h2 class="page-title font-mono">${appState.electricalUnit}</h2>
+            <p class="page-subtitle">Search by KKS or Equipment Name</p>
+        </div>
+        <div class="search-wrapper" style="max-width:100%;">
+            ${searchBtn}
+            <input type="text" id="elecSearchInput" class="ui-input" placeholder="Type to search (e.g. ACW Pump)..." autocomplete="off">
+        </div>
+        <div class="elec-results-scroll-container" id="elecResults" style="display:none;">
+            </div>
     `;
 }
 
@@ -208,11 +231,23 @@ function setupElecSearch() {
     const input = document.getElementById('elecSearchInput');
     const container = document.getElementById('elecResults');
     if (!input || !container) return;
+
     const dataSet = elecData[appState.electricalUnit] || [];
+
     input.addEventListener('input', (e) => {
-        const words = e.target.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
-        if (words.length === 0) { container.style.display = 'none'; return; }
-        const matches = dataSet.filter(row => words.every(w => (row[0] + " " + row[1]).toLowerCase().includes(w)));
+        const query = e.target.value.toLowerCase().trim();
+        const words = query.split(/\s+/).filter(Boolean);
+
+        if (words.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+
+        const matches = dataSet.filter(row => {
+            const str = (row[0] + " " + row[1]).toLowerCase();
+            return words.every(w => str.includes(w));
+        });
+
         if (matches.length > 0) {
             container.innerHTML = matches.map(row => `
                 <div class="list-card">
@@ -224,50 +259,104 @@ function setupElecSearch() {
             `).join('');
             container.style.display = 'block';
         } else {
-            container.innerHTML = `<div class="list-card text-muted">No matching feeders found.</div>`;
+            container.innerHTML = `<div class="list-card text-muted">No match found</div>`;
             container.style.display = 'block';
         }
     });
 }
 
 // ----------------- PROTECTION -----------------
-
 function renderProtection() {
     if (!appState.protectionArea && !appState.protectionEquip) {
         const areas = Object.keys(protData);
         return `
-            <div class="page-head"><h2 class="page-title font-mono">Protection Dashboard</h2><p class="page-subtitle">Search globally or select an area below</p></div>
-            <div class="search-wrapper">${searchBtn}<input type="text" id="protSearchInput" class="ui-input" placeholder="Search for any equipment..." autocomplete="off"><div id="protDropdown" class="search-dropdown"></div></div>
+            <div class="page-head">
+                <h2 class="page-title font-mono">Equipment Protection</h2>
+                <p class="page-subtitle">Search globally or select an area below</p>
+            </div>
+            
+            <div class="search-wrapper">
+                ${searchBtn}
+                <input type="text" id="protSearchInput" class="ui-input" placeholder="Search for any equipment..." autocomplete="off">
+                <div id="protDropdown" class="search-dropdown"></div>
+            </div>
+
             <div class="item-grid" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
                 ${areas.map((area) => {
-                    let iconToUse = area.toLowerCase().includes('boiler') ? iconBoiler : area.toLowerCase().includes('turbine') ? iconTurbine : area.toLowerCase().includes('fgd') ? iconFGD : iconFactory;
-                    return `<button class="ui-card" style="padding: 1rem;" onclick="updateState({protectionArea: '${area}'})"><div style="display:flex; align-items:center; gap:0.9rem;"><div class="card-icon-box" style="width: 2.25rem; height: 2.25rem; flex-shrink: 0;">${iconToUse}</div><span class="card-title font-mono">${area}</span></div></button>`
-                }).join('')}
+            let iconToUse = iconFactory;
+            const aLower = area.toLowerCase();
+            if (aLower.includes('boiler')) iconToUse = iconBoiler;
+            else if (aLower.includes('turbine')) iconToUse = iconTurbine;
+            else if (aLower.includes('fgd')) iconToUse = iconFGD;
+
+            return `
+                    <button class="ui-card" style="padding: 1rem;" onclick="updateState({protectionArea: '${area}'})">
+                        <div style="display:flex; align-items:center; gap:0.9rem;">
+                            <div class="card-icon-box" style="width: 2.25rem; height: 2.25rem; flex-shrink: 0;">${iconToUse}</div>
+                            <span class="card-title font-mono">${area}</span>
+                        </div>
+                    </button>
+                `}).join('')}
             </div>
         `;
     }
+
     if (appState.protectionArea && !appState.protectionEquip) {
         const equips = Object.keys(protData[appState.protectionArea] || {});
         return `
-            <div class="page-head"><h2 class="page-title font-mono">${appState.protectionArea}</h2><p class="page-subtitle">Select equipment to view protection logics</p></div>
+            <div class="page-head">
+                <h2 class="page-title font-mono">${appState.protectionArea}</h2>
+                <p class="page-subtitle">Select equipment for it's protection logics</p>
+            </div>
             <div class="item-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
-                ${equips.map((equip) => `<button class="ui-card" style="padding: 0.8rem;" onclick="updateState({protectionEquip: '${equip}'})"><div style="display:flex; align-items:center; gap:0.6rem;"><div class="card-icon-box" style="width: 1.65rem; height: 1.65rem; flex-shrink: 0; background: white; box-shadow: none;">${iconGear}</div><span class="card-title font-mono text-balance" style="text-align:left;">${equip}</span></div></button>`).join('')}
+                ${equips.map((equip) => `
+                    <button class="ui-card" style="padding: 0.8rem;" onclick="updateState({protectionEquip: '${equip}'})">
+                        <div style="display:flex; align-items:center; gap:0.6rem;">
+                            <div class="card-icon-box" style="width: 1.65rem; height: 1.65rem; flex-shrink: 0; background: white; box-shadow: none;">${iconGear}</div>
+                            <span class="card-title font-mono text-balance" style="text-align:left;">${equip}</span>
+                        </div>
+                    </button>
+                `).join('')}
             </div>
         `;
     }
+
+    // Equipment specific table render
     const protecs = protData[appState.protectionArea][appState.protectionEquip] || [];
-    let tbody = protecs.length ? protecs.map(prot => {
-        let paramKey = Object.keys(prot).find(k => k.toLowerCase().includes('name') || k.toLowerCase().includes('parameter'));
-        let valKey = Object.keys(prot).find(k => k.toLowerCase().includes('value') || k.toLowerCase().includes('condition'));
-        let param = paramKey ? prot[paramKey] : '-';
-        let val = valKey ? prot[valKey] : '';
-        let displayVal = Array.isArray(val) ? val.map(v => `<div style="margin-bottom:6px; display:flex; gap:6px;"><span style="color:var(--module-protection)">•</span> ${v}</div>`).join('') : String(val).trim();
-        return `<tr><td style="width:45%;"><strong class="text-foreground">${param}</strong></td><td>${displayVal}</td></tr>`;
-    }).join('') : '<tr><td colspan="2" style="text-align:center;" class="text-muted">No protections found.</td></tr>';
+    let tbody = '';
+    if (protecs.length) {
+        tbody = protecs.map(prot => {
+            let paramKey = Object.keys(prot).find(k => k.toLowerCase().includes('name') || k.toLowerCase().includes('parameter'));
+            let valKey = Object.keys(prot).find(k => k.toLowerCase().includes('value') || k.toLowerCase().includes('condition'));
+            let actionKey = Object.keys(prot).find(k => k.toLowerCase().includes('action'));
+
+            let param = paramKey ? prot[paramKey] : '-';
+            let val = valKey ? prot[valKey] : '';
+            if (actionKey && prot[actionKey]) param += ` <span style="opacity:0.6;font-size:0.8em">(${prot[actionKey]})</span>`;
+
+            let displayVal = Array.isArray(val)
+                ? val.map(v => `<div style="margin-bottom:6px;"><span> </span> ${v}</div>`).join('')
+                : String(val).trim();
+
+            return `<tr><td style="width:45%;"><strong class="text-foreground">${param}</strong></td><td>${displayVal}</td></tr>`;
+        }).join('');
+    } else {
+        tbody = '<tr><td colspan="2" style="text-align:center;" class="text-muted">No protections found.</td></tr>';
+    }
 
     return `
-        <div class="page-head"><h2 class="page-title font-mono text-balance">${appState.protectionEquip}</h2><div style="display:flex; align-items:center; gap:6px;"><p class="page-subtitle font-mono clickable-zone" style="cursor:pointer; text-decoration:underline; text-underline-offset:3px;" onclick="updateState({protectionEquip: null})">Zone: ${appState.protectionArea}</p></div></div>
-        <div class="table-wrap"><table class="ui-table"><thead><tr><th style="width: 60%;">Protection Condition</th><th style="width: 40%;">Logic / Value</th></tr></thead><tbody>${tbody}</tbody></table></div>
+        <div class="page-head">
+            <h2 class="page-title font-mono text-balance">${appState.protectionEquip}</h2>
+            <div style="display:flex; align-items:center; gap:6px;">
+                <p class="page-subtitle font-mono clickable-zone" style="cursor:pointer; text-decoration:underline; text-underline-offset:3px;" onclick="updateState({protectionEquip: null})" title="Go back to ${appState.protectionArea}">Zone: ${appState.protectionArea}</p>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table class="ui-table">
+                <thead><tr><th style="width: 60%;">Protection Condition</th><th style="width: 40%;">Logic / Value</th></tr></thead>
+                <tbody>${tbody}</tbody>
+            </table>
+        </div>
     `;
 }
 
@@ -275,16 +364,36 @@ function setupProtSearch() {
     const input = document.getElementById('protSearchInput');
     const drop = document.getElementById('protDropdown');
     if (!input) return;
+
     let flat = [];
-    for (let a in protData) for (let e in protData[a]) flat.push({ area: a, equip: e });
+    for (let a in protData) {
+        for (let e in protData[a]) flat.push({ area: a, equip: e });
+    }
+
     input.addEventListener('input', e => {
-        const words = e.target.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+        const query = e.target.value.toLowerCase().trim();
+        const words = query.split(/\s+/).filter(Boolean);
+
         if (!words.length) { drop.style.display = 'none'; return; }
+
         const matches = flat.filter(m => words.every(w => `${m.equip} ${m.area}`.toLowerCase().includes(w))).slice(0, 50);
-        drop.innerHTML = matches.length ? matches.map(m => `<div class="search-drop-item" onclick="updateState({protectionArea: '${m.area}', protectionEquip: '${m.equip}'})"><div class="sdi-main font-mono">${m.equip}</div><div class="sdi-sub">${m.area}</div></div>`).join('') : '<div class="search-drop-item text-muted text-center" style="cursor:default">No combinations found</div>';
+
+        if (matches.length > 0) {
+            drop.innerHTML = matches.map(m => `
+                <div class="search-drop-item" onclick="updateState({protectionArea: '${m.area}', protectionEquip: '${m.equip}'})">
+                    <div class="sdi-main font-mono">${m.equip}</div>
+                    <div class="sdi-sub">${m.area}</div>
+                </div>
+            `).join('');
+        } else {
+            drop.innerHTML = '<div class="search-drop-item text-muted text-center" style="cursor:default">No equipment found</div>';
+        }
         drop.style.display = 'block';
     });
-    document.addEventListener('click', e => { if (!input.contains(e.target) && !drop.contains(e.target)) drop.style.display = 'none'; });
+
+    document.addEventListener('click', e => {
+        if (!input.contains(e.target) && !drop.contains(e.target)) drop.style.display = 'none';
+    });
 }
 
 // ----------------- DOCUMENTS -----------------
@@ -295,14 +404,14 @@ function renderDocs() {
     if (isDocsLoading && docData.length === 0) {
         return `
             <div class="page-head">
-                <h2 class="page-title font-mono">Operation Library</h2>
-                <p class="page-subtitle">Initial setup...</p>
+                <h2 class="page-title font-mono">Operation Documents</h2>
+                <p class="page-subtitle">Looking for new updates...</p>
             </div>
             <div style="text-align:center; padding: 4rem 1rem; color: var(--muted-foreground);">
                 <div style="margin-bottom: 1rem;">
                     <svg class="spin-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
                 </div>
-                Syncing securely with Google Drive...
+                Syncing updates please wait for a moment...
             </div>
         `;
     }
@@ -311,7 +420,7 @@ function renderDocs() {
     if (docsError && docData.length === 0) {
         return `
             <div class="page-head">
-                <h2 class="page-title font-mono">Operation Library</h2>
+                <h2 class="page-title font-mono">Operation Documents</h2>
                 <p class="page-subtitle text-muted">Sync Failed</p>
             </div>
             <div style="text-align:center; color: var(--module-electrical); padding: 2rem;">
@@ -340,7 +449,7 @@ function renderDocs() {
         });
     }
 
-    let headText = isRoot ? 'Operation Library' : appState.docsPath[appState.docsPath.length - 1];
+    let headText = isRoot ? 'Operation Documents' : appState.docsPath[appState.docsPath.length - 1];
 
     let breadcrumbHTML = '';
     if (!isRoot) {
@@ -359,7 +468,7 @@ function renderDocs() {
     }
 
     let searchHTML = isRoot ? `
-        <div class="search-wrapper" style="margin-top:-0.5rem;">
+        <div class="search-wrapper">
             ${searchBtn}
             <input type="text" id="docsSearchInput" class="ui-input" placeholder="Search for any document in library..." autocomplete="off">
             <div id="docsDropdown" class="search-dropdown"></div>
@@ -392,14 +501,14 @@ function renderDocs() {
     });
 
     if (!subF.size && !files.length) {
-        content = '<div class="text-muted">No items in this folder.</div>';
+        content = '<div class="text-muted">No item in this library</div>';
     }
 
     return `
         <div class="page-head">
             <h2 class="page-title font-mono">${headText}</h2>
             ${breadcrumbHTML}
-            ${isRoot ? '<p class="page-subtitle" style="margin-top:0.25rem;"></p>' : ''}
+            ${isRoot ? '<p class="page-subtitle">Search globally or select a folder</p>' : ''}
         </div>
         ${searchHTML}
         <div class="item-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
@@ -430,7 +539,7 @@ function setupDocsSearch() {
                 `;
             }).join('');
         } else {
-            drop.innerHTML = '<div class="search-drop-item text-muted text-center" style="cursor:default">No matches</div>';
+            drop.innerHTML = '<div class="search-drop-item text-muted text-center" style="cursor:default">No match in this library</div>';
         }
         drop.style.display = 'block';
     });
