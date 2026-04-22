@@ -1,4 +1,4 @@
-const CACHE_NAME = 'Operation-portal-dynamic-v10';
+const CACHE_NAME = 'Operation-portal-dynamic-v1';
 
 // Cache all essential shell files and the modular data files
 const urlsToCache = [
@@ -14,7 +14,6 @@ const urlsToCache = [
     './manifest.json',
     './icon-192.png',
     './icon-512.png',
-    './favicon.ico',
     './apple-touch-icon.png',
     './icon-header.png'
 ];
