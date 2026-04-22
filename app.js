@@ -200,7 +200,7 @@ function renderElectrical() {
                 <h2 class="page-title font-mono">Electrical Supply</h2>
                 <p class="page-subtitle">Select a plant area to search equipment's electrical supply</p>
             </div>
-            <div class="item-grid" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
+            <div class="item-grid">
                 ${units.map((unit) => `
                     <button class="ui-card" style="padding: 1rem;" onclick="updateState({electricalUnit: '${unit}'})">
                         <div style="display:flex; align-items:center; gap:0.9rem;">
@@ -281,7 +281,7 @@ function renderProtection() {
                 <div id="protDropdown" class="search-dropdown"></div>
             </div>
 
-            <div class="item-grid" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
+            <div class="item-grid">
                 ${areas.map((area) => {
             let iconToUse = iconFactory;
             const aLower = area.toLowerCase();
@@ -308,12 +308,12 @@ function renderProtection() {
                 <h2 class="page-title font-mono">${appState.protectionArea}</h2>
                 <p class="page-subtitle">Select equipment for it's protection logics</p>
             </div>
-            <div class="item-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+            <div class="item-grid">
                 ${equips.map((equip) => `
                     <button class="ui-card" style="padding: 0.8rem;" onclick="updateState({protectionEquip: '${equip}'})">
                         <div style="display:flex; align-items:center; gap:0.6rem;">
                             <div class="card-icon-box" style="width: 1.65rem; height: 1.65rem; flex-shrink: 0; background: white; box-shadow: none;">${iconGear}</div>
-                            <span class="card-title font-mono text-balance" style="text-align:left;">${equip}</span>
+                            <span class="card-title font-mono" style="text-align:left;">${equip}</span>
                         </div>
                     </button>
                 `).join('')}
@@ -346,7 +346,7 @@ function renderProtection() {
 
     return `
         <div class="page-head">
-            <h2 class="page-title font-mono text-balance">${appState.protectionEquip}</h2>
+            <h2 class="page-title font-mono">${appState.protectionEquip}</h2>
             <div style="display:flex; align-items:center; gap:6px;">
                 <p class="page-subtitle font-mono clickable-zone" style="cursor:pointer; text-decoration:underline; text-underline-offset:3px;" onclick="updateState({protectionEquip: null})" title="Go back to ${appState.protectionArea}">Zone: ${appState.protectionArea}</p>
             </div>
@@ -481,7 +481,7 @@ function renderDocs() {
             <button class="ui-card" style="padding: 1rem;" onclick="docsNavigate('${folder}')">
                 <div style="display:flex; align-items:center; gap:0.9rem;">
                     <div class="card-icon-box" style="width: 2.25rem; height: 2.25rem; flex-shrink: 0;">${iconFolder}</div>
-                    <span class="card-title font-mono text-balance" style="text-align:left;">${folder}</span>
+                    <span class="card-title font-mono" style="text-align:left;">${folder}</span>
                 </div>
             </button>
         `;
@@ -494,7 +494,7 @@ function renderDocs() {
             <button class="ui-card" style="padding: 0.8rem;" onclick="openDocument('${url}', '${cn}')">
                 <div style="display:flex; align-items:center; gap:0.6rem;">
                     <div class="card-icon-box" style="width: 1.65rem; height: 1.65rem; flex-shrink: 0; background: white; box-shadow: none;">${iconFile}</div>
-                    <span class="card-title font-mono text-balance" style="font-size:1rem; text-align:left;">${formatName(f.name)}</span>
+                    <span class="card-title font-mono" style="font-size:1rem; text-align: left;">${formatName(f.name)}</span>
                 </div>
             </button>
         `;
@@ -511,7 +511,7 @@ function renderDocs() {
             ${isRoot ? '<p class="page-subtitle">Search globally or select a folder</p>' : ''}
         </div>
         ${searchHTML}
-        <div class="item-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+        <div class="item-grid">
             ${content}
         </div>
     `;
@@ -533,7 +533,7 @@ function setupDocsSearch() {
                 const n = formatName(d.name).replace(/'/g, "\\'");
                 return `
                     <div class="search-drop-item" onclick="openDocument('${u}', '${n}')">
-                        <div class="sdi-main text-balance">${formatName(d.name)}</div>
+                        <div class="sdi-main">${formatName(d.name)}</div>
                         <div class="sdi-sub">Path: ${d.path.join(' / ')}</div>
                     </div>
                 `;
