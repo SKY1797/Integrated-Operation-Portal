@@ -150,7 +150,7 @@ function renderApp() {
 function renderHome() {
     return `
         <div class="ops-grid-bg"></div>
-        <div class="page-head" style="margin-bottom: 1.5rem;">
+        <div class="page-head mobile-center" style="margin-bottom: 1.5rem;">
             <h1 class="page-title font-mono">Integrated Operation Portal</h1>
             <p class="page-subtitle">Select a module to proceed</p>
         </div>
