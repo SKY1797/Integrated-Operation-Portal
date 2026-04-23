@@ -1,4 +1,4 @@
-const CACHE_NAME = 'Operation-portal-dynamic-v1';
+const CACHE_NAME = 'Operation-portal-dynamic-v2';
 
 // Cache all essential shell files and the modular data files
 const urlsToCache = [
@@ -15,7 +15,9 @@ const urlsToCache = [
     './icon-192.png',
     './icon-512.png',
     './apple-touch-icon.png',
-    './icon-header.png'
+    './icon-header.png',
+    './developer-icon.png',
+    './team-icon.png'
 ];
 
 self.addEventListener('install', event => {
