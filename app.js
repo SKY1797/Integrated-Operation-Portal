@@ -155,7 +155,7 @@ function renderHome() {
             <p class="page-subtitle">Select a module to proceed</p>
         </div>
         <div class="item-grid" style="position: relative; z-index: 20; gap: 1.25rem">
-            <button class="ui-card" onclick="updateState({module: 'ELECTRICAL'})">
+            <button class="ui-card" style="flex-direction: column; align-items: normal;" onclick="updateState({module: 'ELECTRICAL'})">
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
                     <div class="card-icon-box" style="background: color-mix(in srgb, var(--module-electrical) 15%, var(--card)); color: var(--module-electrical); flex-shrink: 0; width: 2.5rem; height: 2.5rem;">${iconElec}</div>
                     <div style="display: flex; flex-direction: column;">
@@ -165,7 +165,7 @@ function renderHome() {
                 </div>
                 <div class="card-desc" style="margin-top:0;">Look up KKS tags and equipments for it's supply switchgear and module location</div>
             </button>
-            <button class="ui-card" onclick="updateState({module: 'PROTECTION', protectionArea: null, protectionEquip: null})">
+            <button class="ui-card" style="flex-direction: column; align-items: normal;" onclick="updateState({module: 'PROTECTION', protectionArea: null, protectionEquip: null})">
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
                     <div class="card-icon-box" style="background: color-mix(in srgb, var(--module-protection) 15%, var(--card)); color: var(--module-protection); flex-shrink: 0; width: 2.5rem; height: 2.5rem;">${iconProt}</div>
                     <div style="display: flex; flex-direction: column;">
@@ -175,7 +175,7 @@ function renderHome() {
                 </div>
                 <div class="card-desc" style="margin-top:0;">Browse protection logic for Boiler, Turbine, Offsite and FGD area equipments</div>
             </button>
-            <button class="ui-card" onclick="updateState({module: 'DOCS', docsPath: []})">
+            <button class="ui-card" style="flex-direction: column; align-items: normal;" onclick="updateState({module: 'DOCS', docsPath: []})">
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
                     <div class="card-icon-box" style="background: color-mix(in srgb, var(--module-docs) 15%, var(--card)); color: var(--module-docs); flex-shrink: 0; width: 2.5rem; height: 2.5rem;">${iconDocs}</div>
                     <div style="display: flex; flex-direction: column;">
@@ -214,16 +214,18 @@ function renderElectrical() {
     }
 
     return `
-        <div class="page-head">
-            <h2 class="page-title font-mono">${appState.electricalUnit}</h2>
-            <p class="page-subtitle">Search by KKS or Equipment Name</p>
-        </div>
-        <div class="search-wrapper" style="max-width:100%;">
-            ${searchBtn}
-            <input type="text" id="elecSearchInput" class="ui-input" placeholder="Type to search (e.g. ACW Pump)..." autocomplete="off">
+        <div class="top-bar">
+            <div class="page-head">
+                <h2 class="page-title font-mono">${appState.electricalUnit}</h2>
+                <p class="page-subtitle">Search by KKS or Equipment Name</p>
+            </div>
+            <div class="search-wrapper">
+                ${searchBtn}
+                <input type="text" id="elecSearchInput" class="ui-input" placeholder="Type to search (e.g. ACW Pump)..." autocomplete="off">
+            </div>
         </div>
         <div class="elec-results-scroll-container" id="elecResults" style="display:none;">
-            </div>
+        </div>
     `;
 }
 
@@ -270,15 +272,17 @@ function renderProtection() {
     if (!appState.protectionArea && !appState.protectionEquip) {
         const areas = Object.keys(protData);
         return `
-            <div class="page-head">
-                <h2 class="page-title font-mono">Equipment Protection</h2>
-                <p class="page-subtitle">Search globally or select an area below</p>
-            </div>
-            
-            <div class="search-wrapper">
-                ${searchBtn}
-                <input type="text" id="protSearchInput" class="ui-input" placeholder="Search for any equipment..." autocomplete="off">
-                <div id="protDropdown" class="search-dropdown"></div>
+            <div class="top-bar">
+                <div class="page-head">
+                    <h2 class="page-title font-mono">Equipment Protection</h2>
+                    <p class="page-subtitle">Search globally or select an area below</p>
+                </div>
+                
+                <div class="search-wrapper">
+                    ${searchBtn}
+                    <input type="text" id="protSearchInput" class="ui-input" placeholder="Search for any equipment..." autocomplete="off">
+                    <div id="protDropdown" class="search-dropdown"></div>
+                </div>
             </div>
 
             <div class="item-grid">
@@ -505,12 +509,14 @@ function renderDocs() {
     }
 
     return `
-        <div class="page-head">
-            <h2 class="page-title font-mono">${headText}</h2>
-            ${breadcrumbHTML}
-            ${isRoot ? '<p class="page-subtitle">Search globally or select a folder</p>' : ''}
+        <div class="top-bar">
+            <div class="page-head">
+                <h2 class="page-title font-mono">${headText}</h2>
+                ${breadcrumbHTML}
+                ${isRoot ? '<p class="page-subtitle">Search globally or select a folder</p>' : ''}
+            </div>
+            ${searchHTML}
         </div>
-        ${searchHTML}
         <div class="item-grid">
             ${content}
         </div>
