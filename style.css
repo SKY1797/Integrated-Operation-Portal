@@ -234,7 +234,7 @@ body {
   width: 100%;
   max-width: 90rem;
   margin: 0 auto;
-  padding: 1.15rem 1.35rem 1.35rem;
+  padding: 0.8rem 1.35rem 1.35rem;
   position: relative;
   z-index: 10;
   animation: fadeIn 0.4s ease-out;
@@ -520,7 +520,7 @@ body {
 .top-bar {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.1rem;
   gap: 1.1rem 1rem;
 }
 
@@ -788,7 +788,7 @@ body {
   background-color: var(--muted);
   border-radius: var(--radius);
   padding: 0.5rem;
-  max-width: 35rem;
+  max-width: 30rem;
   margin: 0 auto 1rem auto;
   height: 3.3rem;
 }
@@ -822,6 +822,8 @@ body {
   border-radius: var(--radius);
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   animation: fadeIn 0.4s ease-out;
+  max-width: 30rem;
+  margin: auto;
 }
 
 .calendar-header {
@@ -891,18 +893,12 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 7rem;
+  height: 6rem;
   padding: 0.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   transition: all 0.2s ease-in-out;
   cursor: pointer;
-}
-
-@media (min-width: 640px) {
-  .day-card {
-    height: 8rem;
-  }
 }
 
 .day-card:hover {
@@ -917,14 +913,14 @@ body {
 }
 
 .day-card.today {
-  outline: 2px solid var(--ring);
+  outline: 2.5px solid var(--ring);
   outline-offset: 2px;
-  background-color: var(--background);
+  /* background-color: var(--background); */
 }
 
-.day-card.today .day-number {
+/* .day-card.today .day-number {
   color: var(--foreground);
-}
+} */
 
 /* Shift Backgrounds & Colors */
 .day-card.shift-morning {
